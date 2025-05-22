@@ -1,6 +1,6 @@
 {
     "name": "react-text-mask-modern",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "A modern, React 19+ compatible input masking component using hooks and TypeScript.",
     "main": "dist/index.js",
     "module": "dist/index.mjs",
