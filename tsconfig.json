@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+      "lib": ["ES2020", "DOM", "DOM.Iterable", "ESNext.AsyncIterable"],
+      "target": "ESNext",
+      "module": "ESNext",
+      "moduleResolution": "Node",
+      "jsx": "react-jsx",
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "strict": true,
+      "declaration": true,
+      "declarationDir": "dist",
+      "outDir": "dist",
+      "baseUrl": "./src"
+    },
+    "include": ["src", "index.ts"]
+  }
+  
