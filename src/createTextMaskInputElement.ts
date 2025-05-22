@@ -13,10 +13,14 @@ const strNone = 'none';
 const strObject = 'object';
 const isAndroid =
   typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent);
-const defer =
-  typeof requestAnimationFrame !== 'undefined'
-    ? requestAnimationFrame
-    : setTimeout;
+  const defer = (cb: () => void) => {
+    if (typeof requestAnimationFrame !== 'undefined') {
+      requestAnimationFrame(cb);
+    } else {
+      setTimeout(cb, 0);
+    }
+  };
+  
 
 export interface CreateTextMaskInputElementConfig {
   inputElement: HTMLInputElement;
@@ -83,7 +87,6 @@ export default function createTextMaskInputElement(
 
       if (rawValue === state.previousConformedValue) return;
 
-      // unwrap mask/pipe combo
       if (
         typeof providedMask === strObject &&
         (providedMask as any).pipe !== undefined &&
@@ -120,7 +123,6 @@ export default function createTextMaskInputElement(
 
       const safeRawValue = getSafeRawValue(rawValue);
       const currentCaretPosition = inputElement?.selectionEnd ?? 0;
-
       const { previousConformedValue, previousPlaceholder } = state;
 
       const conformToMaskConfig = {
@@ -140,10 +142,10 @@ export default function createTextMaskInputElement(
       );
 
       let finalConformedValue = conformedValue;
-      const piped = typeof pipe === 'function';
+      let indexesOfPipedChars: number[] = [];
 
-      if (piped) {
-        let pipeResult = pipe?.(conformedValue, {
+      if (typeof pipe === 'function') {
+        let pipeResult = pipe(conformedValue, {
           rawValue: safeRawValue,
           ...conformToMaskConfig,
         });
@@ -154,10 +156,11 @@ export default function createTextMaskInputElement(
             rejected: true,
           };
         } else if (isString(pipeResult)) {
-          pipeResult = { value: pipeResult as string };
+          pipeResult = { value: pipeResult };
         }
 
         finalConformedValue = (pipeResult as any).value;
+        indexesOfPipedChars = (pipeResult as any).indexesOfPipedChars || [];
       }
 
       const adjustedCaretPosition = adjustCaretPosition({
@@ -168,8 +171,8 @@ export default function createTextMaskInputElement(
         rawValue: safeRawValue,
         currentCaretPosition,
         placeholderChar,
-        indexesOfPipedChars: [],
-        caretTrapIndexes: caretTrapIndexes as never[],
+        indexesOfPipedChars,
+        caretTrapIndexes: caretTrapIndexes || [],
       });
 
       const inputValueShouldBeEmpty =
@@ -182,10 +185,9 @@ export default function createTextMaskInputElement(
       state.previousConformedValue = inputElementValue;
       state.previousPlaceholder = placeholder;
 
-      if (inputElement?.value === inputElementValue) return;
-      if (!inputElement) return;
-      inputElement.value = inputElementValue;
+      if (!inputElement || inputElement.value === inputElementValue) return;
 
+      inputElement.value = inputElementValue;
       safeSetSelection(inputElement, adjustedCaretPosition || 0);
     },
   };
@@ -193,18 +195,20 @@ export default function createTextMaskInputElement(
 
 function safeSetSelection(element: HTMLInputElement, position: number) {
   if (document.activeElement === element) {
+    const cb = () => element.setSelectionRange(position, position, strNone);
+
     if (isAndroid) {
-      defer(() => element.setSelectionRange(position, position, strNone), 0);
+      defer(cb);
     } else {
       element.setSelectionRange(position, position, strNone);
     }
   }
 }
-
 function getSafeRawValue(value: unknown): string {
-  if (isString(value)) return value as string;
+  if (isString(value)) return value;
   if (isNumber(value)) return String(value);
   if (value === undefined || value === null) return emptyString;
+
   throw new Error(
     `The 'value' provided to Text Mask needs to be a string or a number. Received: ${JSON.stringify(
       value
