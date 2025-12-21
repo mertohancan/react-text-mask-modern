@@ -1,9 +1,9 @@
-export { MaskedInput } from './src/MaskedInput'
+export { MaskedInput, MaskedInputProps } from "./src/MaskedInput";
 
 /**
  * Usage Example:
  *
- * import { MaskedInput } from 'react-text-mask-modern';
+ * import { MaskedInput, MaskedInputProps } from 'react-text-mask-modern';
  *
  * <MaskedInput
  *   mask={[/\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
@@ -12,4 +12,3 @@ export { MaskedInput } from './src/MaskedInput'
  *   onChange={(e) => setValue(e.target.value)}
  * />
  */
-
