@@ -1,11 +1,11 @@
 import { convertMaskToPlaceholder, isArray, processCaretTraps } from '../utils';
 import { placeholderChar as defaultPlaceholderChar } from '../constants';
 
-type Mask =
+export type Mask =
   | Array<string | RegExp>
   | ((value: string, config?: any) => Array<string | RegExp> | false);
 
-interface ConformToMaskConfig {
+export interface ConformToMaskConfig {
   guide?: boolean;
   previousConformedValue?: string;
   placeholderChar?: string;
@@ -14,7 +14,7 @@ interface ConformToMaskConfig {
   keepCharPositions?: boolean;
 }
 
-interface ConformToMaskResult {
+export interface ConformToMaskResult {
   conformedValue: string;
   meta: {
     someCharsRejected: boolean;

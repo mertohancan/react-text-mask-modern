@@ -1,7 +1,7 @@
 const defaultArray: any[] = [];
-const emptyString = '';
+const emptyString = "";
 
-interface AdjustCaretPositionArgs {
+export interface AdjustCaretPositionArgs {
   previousConformedValue?: string;
   previousPlaceholder?: string;
   currentCaretPosition?: number;
